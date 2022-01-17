@@ -1,17 +1,40 @@
 import React from 'react';
 import { QuestionList } from './QuestionList';
-import { getUnansweredQuestions } from './QuestionData';
+import { getUnansweredQuestions, QuestionData } from './QuestionData';
 import { Page } from './Page';
 import { PageTitle } from './PageTitle';
 
-export const HomePage = () => (
-  <Page>
-    <div>
-      <PageTitle>Unanswered Questions</PageTitle>
+export const HomePage = () => {
+  const [questions, setQuestions] = React.useState<QuestionData[]>([]);
+
+  const [questionsLoading, setQuestionsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const doGetUnansweredQuestions = async () => {
+      const unansweredQuestions = await getUnansweredQuestions();
+      setQuestions(unansweredQuestions);
+      setQuestionsLoading(false);
+    };
+    doGetUnansweredQuestions();
+  }, []);
+
+  const handleAskQuestionClick = () => {
+    console.log('TODO: move to the Ask Page');
+  };
+
+  return (
+    <Page>
       <div>
-        <button>Ask a Question</button>
+        <PageTitle>Unanswered Questions</PageTitle>
+        <div>
+          <button onClick={handleAskQuestionClick}>Ask a Question</button>
+        </div>
+        {questionsLoading ? (
+          <div>Loading...</div>
+        ) : (
+          <QuestionList data={questions || []} />
+        )}
       </div>
-      <QuestionList data={getUnansweredQuestions()} />
-    </div>
-  </Page>
-);
+    </Page>
+  );
+};
