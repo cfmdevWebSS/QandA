@@ -3,19 +3,20 @@ import { jsx } from '@emotion/react';
 import { css } from '@emotion/react';
 import { UserIcon } from './Icons';
 import { fontFamily, fontSize, gray1, gray2, gray5 } from './Styles';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
 type FormData = { search: string };
 
 export const Header = () => {
-  const { register } = useForm<FormData>();
+  const { register, handleSubmit } = useForm<FormData>();
   const [searchParams] = useSearchParams();
   const criteria = searchParams.get('criteria') || '';
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitForm = ({ search }: FormData) => {
+    navigate(`search?criteria=${search}`);
   };
+  const navigate = useNavigate();
 
   return (
     <div
@@ -44,7 +45,7 @@ export const Header = () => {
       >
         Q & A
       </Link>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(submitForm)}>
         <input
           {...register('search')}
           name="search"
