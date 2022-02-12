@@ -1,3 +1,5 @@
+import exp from 'constants';
+
 export interface QuestionData {
   questionId: number;
   title: string;
@@ -13,6 +15,25 @@ export interface AnswerData {
   userName: string;
   created: Date;
 }
+
+export interface PostAnswerData {
+  questionId: number;
+  content: string;
+  userName: string;
+  created: Date;
+}
+
+export const postAnswer = async (
+  answer: PostAnswerData,
+): Promise<AnswerData | undefined> => {
+  await wait(500);
+  const question = questions.filter(
+    (q) => q.questionId === answer.questionId,
+  )[0];
+  const answerInQuestion: AnswerData = { answerId: 99, ...answer };
+  question.answers.push(answerInQuestion);
+  return answerInQuestion;
+};
 
 const questions: QuestionData[] = [
   {

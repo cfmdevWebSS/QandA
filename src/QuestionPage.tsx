@@ -11,11 +11,12 @@ import {
   FormButtonContainer,
   PrimaryButton,
   FieldError,
+  SubmissionSuccess,
 } from './Styles';
 import React from 'react';
 import { Page } from './Page';
 import { useParams } from 'react-router-dom';
-import { QuestionData, getQuestion } from './QuestionData';
+import { QuestionData, getQuestion, postAnswer } from './QuestionData';
 import { AnswerList } from './AnswerList';
 import { useForm } from 'react-hook-form';
 
@@ -25,10 +26,14 @@ type FormData = {
 
 export const QuestionPage = () => {
   const [question, setQuestion] = React.useState<QuestionData | null>(null);
+  const [successfullySubmitted, setSuccessfullySubmitted] =
+    React.useState(false);
   const { questionId } = useParams();
   const {
     register,
     formState: { errors },
+    handleSubmit,
+    formState,
   } = useForm<FormData>({ mode: 'onBlur' });
 
   React.useEffect(() => {
@@ -40,6 +45,16 @@ export const QuestionPage = () => {
       doGetQuestion(Number(questionId));
     }
   }, [questionId]);
+
+  const submitForm = async (data: FormData) => {
+    const result = await postAnswer({
+      questionId: question!.questionId,
+      content: data.content,
+      userName: 'Larry',
+      created: new Date(),
+    });
+    setSuccessfullySubmitted(result ? true : false);
+  };
 
   return (
     <Page>
@@ -88,7 +103,9 @@ export const QuestionPage = () => {
                 margin-top: 20px;
               `}
             >
-              <Fieldset>
+              <Fieldset
+                disabled={formState.isSubmitting || successfullySubmitted}
+              >
                 <FieldContainer>
                   <FieldLabel htmlFor="content">Your Answer</FieldLabel>
                   <FieldTextArea
@@ -110,6 +127,11 @@ export const QuestionPage = () => {
                     Submit Your Answer
                   </PrimaryButton>
                 </FormButtonContainer>
+                {successfullySubmitted && (
+                  <SubmissionSuccess>
+                    Your answer was successfully submitted!
+                  </SubmissionSuccess>
+                )}
               </Fieldset>
             </form>
           </React.Fragment>
